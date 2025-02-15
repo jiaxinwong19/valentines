@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Cat1 from "@/app/img/shycat.jpg";
 import Cat2 from "@/app/img/cryingcat.jpg";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import Confetti from "react-confetti";
 
-// Import music file (if using a local file, place it in the public folder)
+// Music file (Ensure this file is in the public/music/ folder)
 const loveSong = "/blue.mp3";
 
 export default function Home() {
@@ -21,7 +21,15 @@ export default function Home() {
   const [buttonWord1, setButtonWord1] = useState("listen to catcat");
   const [listenCount, setListenCount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [audio] = useState(typeof Audio !== "undefined" ? new Audio(loveSong) : null);
+  const audioRef = useRef<HTMLAudioElement | null>(null); // Define type for TypeScript
+
+  useEffect(() => {
+    // Ensure this runs only on the client
+    if (typeof window !== "undefined") {
+      audioRef.current = new Audio(loveSong);
+      audioRef.current.loop = true; // Loop music
+    }
+  }, []);
 
   const handleIgnoreClick = () => {
     if (ignoreCount === 0) {
@@ -40,19 +48,13 @@ export default function Home() {
       setButtonWord("NO!");
       setButtonWord1("YES ❤️");
       setListenCount(1);
-      audio.play(); // Start playing music
+      audioRef.current?.play(); // ✅ Use optional chaining to avoid null errors
     } else {
       setShowConfetti(true);
       setCurrentImage(Cat4);
       setMessage("I LOVE YOU BABY");
     }
   };
-
-  useEffect(() => {
-    if (audio) {
-      audio.loop = true; // Loop the music
-    }
-  }, [audio]);
 
   return (
     <div className="min-h-screen bg-blue-300 flex flex-col items-center justify-center p-4 relative overflow-hidden">
