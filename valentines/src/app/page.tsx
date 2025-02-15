@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Cat1 from "@/app/img/shycat.jpg";
 import Cat2 from "@/app/img/cryingcat.jpg";
 import Cat3 from "@/app/img/flowercat.png";
-import Cat4 from "@/app/img/ringcatto.png"
+import Cat4 from "@/app/img/ringcatto.png";
 import { Button } from "@/components/ui/button";
-import React from 'react'
-import Confetti from 'react-confetti'
+import React from "react";
+import Confetti from "react-confetti";
 
+// Import music file (if using a local file, place it in the public folder)
+const loveSong = "/blue.mp3";
 
 export default function Home() {
   const [currentImage, setCurrentImage] = useState(Cat1);
@@ -19,7 +21,7 @@ export default function Home() {
   const [buttonWord1, setButtonWord1] = useState("listen to catcat");
   const [listenCount, setListenCount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-
+  const [audio] = useState(typeof Audio !== "undefined" ? new Audio(loveSong) : null);
 
   const handleIgnoreClick = () => {
     if (ignoreCount === 0) {
@@ -32,27 +34,30 @@ export default function Home() {
   };
 
   const handleListen = () => {
-    if(listenCount == 0) {
+    if (listenCount === 0) {
       setCurrentImage(Cat3);
-      setMessage("Will you be my Vawentine?")
+      setMessage("Will you be my Vawentine?");
       setButtonWord("NO!");
-      setButtonWord1("YES ❤️")
+      setButtonWord1("YES ❤️");
       setListenCount(1);
-    }
-    else {
+      audio.play(); // Start playing music
+    } else {
       setShowConfetti(true);
       setCurrentImage(Cat4);
       setMessage("I LOVE YOU BABY");
     }
-    
-  }
+  };
 
-
+  useEffect(() => {
+    if (audio) {
+      audio.loop = true; // Loop the music
+    }
+  }, [audio]);
 
   return (
     <div className="min-h-screen bg-blue-300 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {showConfetti && <Confetti />}
-        <div className="flex items-center justify-center gap-x-10">
+      <div className="flex items-center justify-center gap-x-10">
         <Button variant="outline" onClick={handleIgnoreClick}>
           {buttonWord}
         </Button>
